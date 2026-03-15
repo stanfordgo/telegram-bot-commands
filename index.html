@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>📱 Telegram 机器人 · 命令手册</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent; /* 去掉移动端点击灰色背景 */
+        }
+        body {
+            background: #f6f8fa;
+            padding: 16px 12px;
+            color: #1e2a3a;
+        }
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        /* 头部 - 移动端优化 */
+        .header {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .title-section h1 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #11324e;
+            letter-spacing: -0.3px;
+        }
+        .title-section p {
+            color: #4a5f73;
+            font-size: 0.85rem;
+            margin-top: 4px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .badge {
+            background: #d4e1f0;
+            color: #1e3c5c;
+            padding: 4px 10px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        /* 搜索框 - 移动端优化 */
+        .search-wrapper {
+            width: 100%;
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            border: 1px solid #e2e9f2;
+            display: flex;
+            align-items: center;
+            padding: 4px 4px 4px 16px;
+        }
+        .search-wrapper span {
+            color: #8899aa;
+            margin-right: 6px;
+            font-size: 1.1rem;
+        }
+        .search-wrapper input {
+            border: none;
+            background: transparent;
+            width: 100%;
+            font-size: 0.95rem;
+            padding: 10px 0;
+            outline: none;
+            color: #1e2a3a;
+        }
+        .search-wrapper input::placeholder {
+            color: #a8bbcc;
+            font-size: 0.9rem;
+        }
+        .clear-search {
+            background: #eef2f6;
+            border-radius: 30px;
+            border: none;
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            color: #3f5468;
+            cursor: pointer;
+            white-space: nowrap;
+            border: 1px solid transparent;
+            font-weight: 500;
+        }
+        .clear-search:active {
+            background: #dae2ec;
+        }
+
+        /* 分类导航 - 横向滚动 */
+        .category-tabs {
+            display: flex;
+            overflow-x: auto;
+            gap: 8px;
+            margin: 16px 0 16px;
+            padding: 4px 0 8px;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; /* Firefox隐藏滚动条 */
+        }
+        .category-tabs::-webkit-scrollbar {
+            display: none; /* Chrome/Safari隐藏滚动条 */
+        }
+        .cat-btn {
+            background: transparent;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #3f5468;
+            cursor: pointer;
+            border: 1px solid transparent;
+            flex-shrink: 0; /* 防止收缩 */
+        }
+        .cat-btn:active {
+            background: #e3ecf5;
+        }
+        .cat-btn.active {
+            background: #1e3c5c;
+            color: white;
+            box-shadow: 0 2px 8px rgba(0,60,130,0.2);
+        }
+
+        /* 卡片网格 */
+        .grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 8px;
+        }
+        .card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(0, 20, 30, 0.04);
+            border: 1px solid #edf2f9;
+            overflow: hidden;
+        }
+        .card-header {
+            padding: 16px 16px 8px 16px;
+            border-bottom: 1px solid #f0f5fc;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #11324e;
+        }
+        .card-header .perm-tag {
+            margin-left: auto;
+            font-size: 0.7rem;
+            font-weight: 500;
+            padding: 4px 8px;
+            border-radius: 40px;
+            background: #eaf2fd;
+            color: #1d5b9e;
+            white-space: nowrap;
+        }
+        .command-list {
+            padding: 8px 12px 12px 12px;
+            list-style: none;
+        }
+        .command-item {
+            padding: 12px 0 8px 0;
+            border-bottom: 1px dashed #e9f0f8;
+        }
+        .command-item:last-child {
+            border-bottom: none;
+        }
+        .command-name-wrapper {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+        .command-name {
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 0.9rem;
+            background: #f2f7ff;
+            padding: 4px 14px;
+            border-radius: 30px;
+            color: #0f3552;
+            font-weight: 550;
+            border: 1px solid #dde9fb;
+            display: inline-block;
+            word-break: break-word;
+            max-width: 100%;
+        }
+        /* 移动端复制按钮 */
+        .copy-btn {
+            background: transparent;
+            border: 1px solid #cbdae9;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 0.7rem;
+            color: #3f5e7c;
+            cursor: pointer;
+            background: white;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .copy-btn:active {
+            background: #e3ecf5;
+            border-color: #1e3c5c;
+        }
+        .command-desc {
+            font-size: 0.85rem;
+            color: #415e78;
+            line-height: 1.45;
+            padding: 0 4px;
+        }
+        .extra-note {
+            font-size: 0.8rem;
+            color: #7d8f9f;
+            margin-top: 6px;
+            display: inline-block;
+            background: #f8fafd;
+            border-radius: 16px;
+            padding: 3px 12px;
+            border: 1px solid #e6edf6;
+        }
+
+        /* 无结果 */
+        .no-results {
+            background: #f2f6fb;
+            border-radius: 30px;
+            padding: 40px 20px;
+            text-align: center;
+            color: #58748c;
+            font-size: 1rem;
+            border: 1px dashed #bacddc;
+        }
+
+        /* 底部 */
+        .footer-note {
+            margin-top: 32px;
+            border-top: 1px solid #d7e2ed;
+            padding: 20px 0 8px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #6d859e;
+        }
+
+        /* 复制提示toast */
+        .toast-message {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(30, 60, 92, 0.9);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+            animation: fadeInOut 1.5s ease;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            85% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <div class="header">
+        <div class="title-section">
+            <h1>🤖 xxpay 机器人命令手册</h1>
+            <p>
+                <span class="badge">管理员 👑</span>
+                <span class="badge">商户 🧾</span>
+                <span class="badge">离线可用 · 点击复制</span>
+            </p>
+        </div>
+        <div class="search-wrapper">
+            <span>🔍</span>
+            <input type="text" id="searchInput" placeholder="搜索命令 (如 统计, 预付...)" autocomplete="off">
+            <button class="clear-search" id="clearBtn">清除</button>
+        </div>
+    </div>
+
+    <div class="category-tabs" id="categoryTabs">
+        <button class="cat-btn active" data-cat="all">📌 全部</button>
+        <button class="cat-btn" data-cat="merchant">📋 商户管理</button>
+        <button class="cat-btn" data-cat="order">🔎 订单查询</button>
+        <button class="cat-btn" data-cat="prepaid">💰 预付记账</button>
+        <button class="cat-btn" data-cat="stat">📊 统计查询</button>
+        <button class="cat-btn" data-cat="channel">⚙️ 通道配置</button>
+        <button class="cat-btn" data-cat="alert">🚨 预警设置</button>
+        <button class="cat-btn" data-cat="broadcast">📤 群发转发</button>
+        <button class="cat-btn" data-cat="transfer">🔄 传单控制</button>
+        <button class="cat-btn" data-cat="system">📝 系统工具</button>
+        <button class="cat-btn" data-cat="special">🔗 特殊功能</button>
+    </div>
+
+    <div class="grid" id="commandsGrid"></div>
+
+    <div class="footer-note">
+        ⚡ 点击命令右侧【复制】按钮即可复制 · 适配手机触摸
+    </div>
+</div>
+
+<script>
+(function() {
+    const commandsData = [
+        { name: "授权[商户号]", desc: "授权商户到当前群", perm: "admin", cat: "merchant", note: "例：授权20000001" },
+        { name: "绑定|[通道代码]", desc: "绑定通道到当前群", perm: "admin", cat: "merchant", note: "例：绑定|wxPay" },
+        { name: "绑定供货商[ID]", desc: "绑定供货商到当前群", perm: "admin", cat: "merchant", note: "例：绑定供货商1001" },
+        { name: "绑定信息", desc: "查看当前群的绑定信息", perm: "admin", cat: "merchant" },
+        { name: "查看商户", desc: "查看当前群绑定的商户ID", perm: "admin", cat: "merchant" },
+        { name: "清除绑定", desc: "清除当前群的所有绑定", perm: "admin", cat: "merchant", note: "别名：解除绑定" },
+        { name: "退出群组", desc: "机器人主动退出群组", perm: "admin", cat: "merchant" },
+
+        { name: "查单[单号]", desc: "查询订单信息", perm: "mch", cat: "order", note: "例：查单202501011234" },
+        { name: "空单[单号]", desc: "查询订单信息（同查单）", perm: "mch", cat: "order" },
+        { name: "补单[单号]", desc: "管理员补单", perm: "admin", cat: "order" },
+        { name: "补发通知[单号]", desc: "补发订单回调通知", perm: "admin", cat: "order" },
+        { name: "批量转单号[单号列表]", desc: "批量转换商户单号为支付单号", perm: "mch", cat: "order", note: "例：批量转单号 abc123\\ndef456" },
+
+        { name: "+金额", desc: "增加预付（单位元）", perm: "admin", cat: "prepaid", note: "例：+1000" },
+        { name: "-金额", desc: "减少预付", perm: "admin", cat: "prepaid", note: "例：-500" },
+        { name: "+u金额#费率", desc: "按USDT增加预付", perm: "admin", cat: "prepaid", note: "例：+u100#7.2" },
+        { name: "-u金额#费率", desc: "按USDT减少预付", perm: "admin", cat: "prepaid" },
+        { name: "查看余额", desc: "查询当前余额", perm: "admin", cat: "prepaid", note: "别名：0 / +0" },
+        { name: "记账[单号]", desc: "记录订单", perm: "admin", cat: "prepaid" },
+        { name: "记账[单号] [金额]", desc: "记录订单并指定金额", perm: "admin", cat: "prepaid" },
+        { name: "撤销本次", desc: "撤销最近一笔记账", perm: "admin", cat: "prepaid" },
+        { name: "撤销记账[单号]", desc: "撤销指定订单记账", perm: "admin", cat: "prepaid" },
+        { name: "账单", desc: "查看今日记账和下发明细", perm: "admin", cat: "prepaid", note: "HTML格式含按钮" },
+
+        { name: "跑量", desc: "今日跑量统计", perm: "mch", cat: "stat" },
+        { name: "昨日跑量", desc: "昨日跑量统计", perm: "mch", cat: "stat" },
+        { name: "日切统计", desc: "日切统计（含下发结算）", perm: "admin", cat: "stat" },
+        { name: "昨日日切统计", desc: "昨日日切统计", perm: "admin", cat: "stat" },
+        { name: "今日预付", desc: "今日预付明细", perm: "mch", cat: "stat" },
+        { name: "昨日预付", desc: "昨日预付明细", perm: "mch", cat: "stat" },
+        { name: "通道统计", desc: "今日通道统计（含成功率）", perm: "mch", cat: "stat", note: "管理员也可用" },
+        { name: "昨日通道统计", desc: "昨日通道统计", perm: "admin", cat: "stat" },
+        { name: "uj", desc: "欧易OTC全渠道价格", perm: "mch", cat: "stat" },
+        { name: "lz", desc: "欧易OTC支付宝价格", perm: "mch", cat: "stat" },
+        { name: "lw", desc: "欧易OTC微信价格", perm: "mch", cat: "stat" },
+        { name: "lb", desc: "欧易OTC银行卡价格", perm: "mch", cat: "stat" },
+
+        { name: "产品[产品ID]", desc: "查看产品费率", perm: "admin", cat: "channel", note: "例：产品101" },
+        { name: "产品费率", desc: "查看所有产品费率", perm: "admin", cat: "channel" },
+        { name: "产品[ID]#o", desc: "开启产品", perm: "admin", cat: "channel" },
+        { name: "产品[ID]#c", desc: "关闭产品", perm: "admin", cat: "channel" },
+        { name: "设置产品[ID]#[费率]", desc: "设置产品费率", perm: "admin", cat: "channel", note: "例：设置产品101#2.5" },
+        { name: "修改通道[编码]#[费率]", desc: "修改通道费率", perm: "admin", cat: "channel" },
+        { name: "查看渠道[编码]", desc: "查看通道信息", perm: "admin", cat: "channel" },
+        { name: "关闭渠道[编码]", desc: "关闭通道", perm: "admin", cat: "channel" },
+        { name: "打开渠道[编码]", desc: "打开通道", perm: "admin", cat: "channel" },
+        { name: "批量修改产品[配置]", desc: "批量修改产品费率", perm: "admin", cat: "channel", note: "例：1#2.5 2#3.0" },
+        { name: "批量修改通道[配置]", desc: "批量修改通道费率", perm: "admin", cat: "channel", note: "例：1001#2.5 1002#3.0" },
+
+        { name: "通道预警|[通道]|[阈值]@机器人", desc: "设置通道预警阈值", perm: "admin", cat: "alert" },
+        { name: "通道预警停单|[通道]|[阈值]@机器人", desc: "设置通道停单阈值", perm: "admin", cat: "alert" },
+        { name: "通道预警频率|[通道]|[分钟]@机器人", desc: "设置通道预警频率", perm: "admin", cat: "alert" },
+        { name: "供货商预警|[ID]|[阈值]@机器人", desc: "设置供货商预警阈值", perm: "admin", cat: "alert" },
+        { name: "供货商预警停单|[ID]|[阈值]@机器人", desc: "设置供货商停单阈值", perm: "admin", cat: "alert" },
+        { name: "供货商预警频率|[ID]|[分钟]@机器人", desc: "设置供货商预警频率", perm: "admin", cat: "alert" },
+
+        { name: "商户群转发", desc: "转发消息到所有授权商户群 (回复消息)", perm: "admin", cat: "broadcast" },
+        { name: "商户群@转发", desc: "转发并@指定成员 (回复消息)", perm: "admin", cat: "broadcast" },
+        { name: "通道群转发", desc: "转发消息到所有通道群 (回复消息)", perm: "admin", cat: "broadcast" },
+        { name: "更新商户群发信息", desc: "更新商户群发缓存", perm: "admin", cat: "broadcast" },
+
+        { name: "总传单打开", desc: "开启全局传单功能", perm: "admin", cat: "transfer" },
+        { name: "总传单关闭", desc: "关闭全局传单功能", perm: "admin", cat: "transfer" },
+        { name: "传单总开关状态", desc: "查看传单总开关状态", perm: "admin", cat: "transfer" },
+        { name: "传单打开", desc: "开启当前群的传单功能", perm: "admin", cat: "transfer" },
+        { name: "传单关闭", desc: "关闭当前群的传单功能", perm: "admin", cat: "transfer" },
+        { name: "打开催单", desc: "开启催单功能", perm: "admin", cat: "transfer" },
+        { name: "关闭催单", desc: "关闭催单功能", perm: "admin", cat: "transfer" },
+
+        { name: "地址", desc: "获取钱包地址", perm: "admin", cat: "system" },
+        { name: "设置地址[T地址]", desc: "设置钱包地址", perm: "admin", cat: "system" },
+        { name: "计算[表达式]", desc: "数学计算", perm: "admin", cat: "system", note: "例：计算1+2*3" },
+        { name: "获取群ID", desc: "获取当前群ID", perm: "admin", cat: "system", note: "别名：群id" },
+        { name: "对接信息", desc: "获取商户对接信息", perm: "admin", cat: "system" },
+        { name: "调整余额[金额]", desc: "调整商户余额", perm: "admin", cat: "system" },
+        { name: "设置为管理群", desc: "将当前群设为管理群", perm: "admin", cat: "system" },
+        { name: "cc+[code]", desc: "添加白名单code", perm: "admin", cat: "system" },
+        { name: "cc-[code]", desc: "移除白名单code", perm: "admin", cat: "system" },
+        { name: "=cclist", desc: "查看白名单列表", perm: "admin", cat: "system" },
+        { name: "核对渠道对接信息", desc: "查看渠道对接参数", perm: "admin", cat: "system" },
+        { name: "删除", desc: "删除消息 (回复消息)", perm: "admin", cat: "system" },
+
+        { name: "📸 图片自动传单", desc: "发送带商户单号的图片自动转发到对应通道群", perm: "mch", cat: "special", note: "自动识别，支持催单" },
+        { name: "🔗 TRC20地址识别", desc: "自动检测消息中T开头的34位地址，提供确认按钮", perm: "all", cat: "special", note: "记录次数" },
+    ];
+
+    const catNameMap = {
+        merchant: "商户管理", order: "订单查询", prepaid: "预付记账", stat: "统计查询",
+        channel: "通道配置", alert: "预警设置", broadcast: "群发转发", transfer: "传单控制",
+        system: "系统工具", special: "特殊功能"
+    };
+    const permMap = { admin: "👑", mch: "🧾", all: "👤" };
+
+    const grid = document.getElementById('commandsGrid');
+    const searchInput = document.getElementById('searchInput');
+    const clearBtn = document.getElementById('clearBtn');
+    const catBtns = document.querySelectorAll('.cat-btn');
+
+    let activeCat = 'all';
+    let searchTerm = '';
+
+    // 显示toast
+    function showToast(text) {
+        const toast = document.createElement('div');
+        toast.className = 'toast-message';
+        toast.textContent = text;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 1500);
+    }
+
+    // 复制函数
+    function copyToClipboard(text) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast(`✅ 已复制: ${text}`);
+            }).catch(() => fallbackCopy(text));
+        } else {
+            fallbackCopy(text);
+        }
+    }
+
+    function fallbackCopy(text) {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        textarea.setSelectionRange(0, 99999);
+        try {
+            document.execCommand('copy');
+            showToast(`✅ 已复制: ${text}`);
+        } catch (err) {
+            showToast('❌ 复制失败，请手动选择');
+        }
+        document.body.removeChild(textarea);
+    }
+
+    function render() {
+        const term = searchTerm.trim().toLowerCase();
+        const filtered = commandsData.filter(cmd => {
+            if (activeCat !== 'all' && cmd.cat !== activeCat) return false;
+            if (term === '') return true;
+            const catChinese = catNameMap[cmd.cat] || '';
+            const note = cmd.note || '';
+            const searchable = `${cmd.name} ${cmd.desc} ${note} ${catChinese}`.toLowerCase();
+            return searchable.includes(term);
+        });
+
+        const grouped = {};
+        filtered.forEach(cmd => {
+            if (!grouped[cmd.cat]) grouped[cmd.cat] = [];
+            grouped[cmd.cat].push(cmd);
+        });
+
+        grid.innerHTML = '';
+
+        if (filtered.length === 0) {
+            grid.innerHTML = `<div class="no-results">😕 没有匹配的命令，试试其他关键词～</div>`;
+            return;
+        }
+
+        const catOrder = ['merchant','order','prepaid','stat','channel','alert','broadcast','transfer','system','special'];
+        for (let catKey of catOrder) {
+            if (grouped[catKey] && grouped[catKey].length > 0) {
+                const catDisplay = catNameMap[catKey] || catKey;
+                const catCommands = grouped[catKey];
+
+                let cardHtml = `<div class="card" data-category="${catKey}">`;
+                cardHtml += `<div class="card-header"><h3>📁 ${catDisplay}</h3>`;
+                const permSet = new Set(catCommands.map(c => c.perm));
+                const permText = Array.from(permSet).map(p => permMap[p] || p).join('/');
+                cardHtml += `<span class="perm-tag">${permText}</span>`;
+                cardHtml += `</div>`;
+                cardHtml += `<ul class="command-list">`;
+
+                catCommands.forEach(cmd => {
+                    const permIcon = permMap[cmd.perm] || '';
+                    // 为每个命令添加一个专门的复制按钮
+                    cardHtml += `<li class="command-item">`;
+                    cardHtml += `<div class="command-name-wrapper">`;
+                    cardHtml += `<span class="command-name">${cmd.name}</span>`;
+                    cardHtml += `<button class="copy-btn" data-copy="${cmd.name.replace(/"/g, '&quot;')}">📋 复制</button>`;
+                    cardHtml += `</div>`;
+                    cardHtml += `<div class="command-desc">${cmd.desc} ${permIcon}</div>`;
+                    if (cmd.note) cardHtml += `<div class="extra-note">📎 ${cmd.note}</div>`;
+                    cardHtml += `</li>`;
+                });
+
+                cardHtml += `</ul></div>`;
+                grid.innerHTML += cardHtml;
+            }
+        }
+    }
+
+    // 事件监听：复制按钮
+    grid.addEventListener('click', (e) => {
+        const copyBtn = e.target.closest('.copy-btn');
+        if (copyBtn) {
+            e.preventDefault();
+            const textToCopy = copyBtn.getAttribute('data-copy');
+            if (textToCopy) copyToClipboard(textToCopy);
+        }
+    });
+
+    function setActiveCatButton(cat) {
+        catBtns.forEach(btn => {
+            const btnCat = btn.getAttribute('data-cat');
+            btn.classList.toggle('active', btnCat === cat);
+        });
+    }
+
+    catBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            activeCat = e.target.getAttribute('data-cat');
+            setActiveCatButton(activeCat);
+            render();
+        });
+    });
+
+    searchInput.addEventListener('input', (e) => {
+        searchTerm = e.target.value;
+        if (searchTerm.trim() !== '') {
+            activeCat = 'all';
+            setActiveCatButton('all');
+        } else {
+            setActiveCatButton(activeCat);
+        }
+        render();
+    });
+
+    clearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        searchTerm = '';
+        activeCat = 'all';
+        setActiveCatButton('all');
+        render();
+    });
+
+    render();
+})();
+</script>
+</body>
+</html>
