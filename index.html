@@ -1,0 +1,1729 @@
+<!doctype html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+        />
+        <meta name="theme-color" content="#0088cc" />
+        <title>Telegram 机器人命令手册</title>
+        <style>
+            :root {
+                --tg: #0088cc;
+                --tg-dark: #006699;
+                --bg: #f4f6f8;
+                --card: #ffffff;
+                --text: #1c2733;
+                --muted: #6b7785;
+                --border: #e3e8ee;
+                --code-bg: #eef3f7;
+                --th-bg: #f0f7fb;
+                --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            }
+            @media (prefers-color-scheme: dark) {
+                :root {
+                    --bg: #0f1620;
+                    --card: #1a2330;
+                    --text: #e6edf3;
+                    --muted: #93a1b0;
+                    --border: #2a3645;
+                    --code-bg: #243140;
+                    --th-bg: #1f2c3a;
+                    --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+                }
+            }
+            * {
+                box-sizing: border-box;
+                -webkit-tap-highlight-color: transparent;
+            }
+            html {
+                scroll-behavior: smooth;
+            }
+            body {
+                margin: 0;
+                font-family:
+                    -apple-system, BlinkMacSystemFont, "Segoe UI",
+                    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+                    "Helvetica Neue", Arial, sans-serif;
+                background: var(--bg);
+                color: var(--text);
+                line-height: 1.6;
+                font-size: 15px;
+                -webkit-text-size-adjust: 100%;
+            }
+            header {
+                position: sticky;
+                top: 0;
+                z-index: 20;
+                background: linear-gradient(135deg, var(--tg), var(--tg-dark));
+                color: #fff;
+                padding: env(safe-area-inset-top) 16px 0;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            }
+            .header-inner {
+                padding: 12px 0;
+            }
+            header h1 {
+                margin: 0;
+                font-size: 18px;
+                font-weight: 600;
+            }
+            header p {
+                margin: 2px 0 0;
+                font-size: 12px;
+                opacity: 0.85;
+            }
+            .search-wrap {
+                padding: 0 0 12px;
+            }
+            #search {
+                width: 100%;
+                padding: 10px 14px;
+                border: none;
+                border-radius: 10px;
+                font-size: 15px;
+                background: rgba(255, 255, 255, 0.95);
+                color: #1c2733;
+                outline: none;
+            }
+            main {
+                padding: 16px 12px 60px;
+                max-width: 860px;
+                margin: 0 auto;
+            }
+
+            /* 目录 */
+            .toc {
+                background: var(--card);
+                border: 1px solid var(--border);
+                border-radius: 12px;
+                padding: 12px 14px;
+                margin-bottom: 18px;
+                box-shadow: var(--shadow);
+            }
+            .toc summary {
+                font-weight: 600;
+                cursor: pointer;
+                font-size: 15px;
+                list-style: none;
+            }
+            .toc summary::-webkit-details-marker {
+                display: none;
+            }
+            .toc summary::before {
+                content: "📑 ";
+            }
+            .toc ol {
+                margin: 10px 0 0;
+                padding-left: 20px;
+                columns: 2;
+                column-gap: 16px;
+                font-size: 14px;
+            }
+            .toc li {
+                margin: 4px 0;
+                break-inside: avoid;
+            }
+            .toc a {
+                color: var(--tg);
+                text-decoration: none;
+            }
+
+            section {
+                background: var(--card);
+                border: 1px solid var(--border);
+                border-radius: 12px;
+                padding: 14px;
+                margin-bottom: 16px;
+                box-shadow: var(--shadow);
+            }
+            section h2 {
+                font-size: 16px;
+                margin: 0 0 10px;
+                padding-bottom: 8px;
+                border-bottom: 2px solid var(--tg);
+                color: var(--tg-dark);
+                scroll-margin-top: 120px;
+            }
+            @media (prefers-color-scheme: dark) {
+                section h2 {
+                    color: #4db6e6;
+                }
+            }
+            section h3 {
+                font-size: 14px;
+                margin: 14px 0 8px;
+                color: var(--text);
+            }
+            section > p {
+                font-size: 14px;
+                color: var(--text);
+                margin: 8px 0;
+            }
+            .note {
+                font-size: 13px;
+                color: var(--muted);
+                background: var(--code-bg);
+                border-left: 3px solid var(--tg);
+                padding: 8px 10px;
+                border-radius: 6px;
+                margin: 10px 0;
+            }
+
+            /* 表格在桌面正常显示，可横向滚动 */
+            .table-wrap {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 13.5px;
+                min-width: 100%;
+            }
+            th,
+            td {
+                text-align: left;
+                padding: 8px 10px;
+                border-bottom: 1px solid var(--border);
+                vertical-align: top;
+            }
+            th {
+                background: var(--th-bg);
+                font-weight: 600;
+                white-space: nowrap;
+            }
+            tbody tr:last-child td {
+                border-bottom: none;
+            }
+
+            code {
+                font-family:
+                    "SF Mono", "Cascadia Code", Consolas, "Liberation Mono",
+                    monospace;
+                background: var(--code-bg);
+                padding: 1px 5px;
+                border-radius: 4px;
+                font-size: 0.88em;
+                word-break: break-word;
+            }
+            .badge {
+                display: inline-block;
+                min-width: 22px;
+                text-align: center;
+                padding: 1px 7px;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: 600;
+                color: #fff;
+                white-space: nowrap;
+            }
+            .b0 {
+                background: #e0533d;
+            } /* 管理员 */
+            .b1 {
+                background: #e08a00;
+            } /* 操作员 */
+            .b3 {
+                background: #38a169;
+            } /* 公开 */
+            .bp {
+                background: #718096;
+            } /* 公开（注释鉴权） */
+
+            /* 手机端：表格转卡片 */
+            @media (max-width: 640px) {
+                table,
+                thead,
+                tbody,
+                th,
+                td,
+                tr {
+                    display: block;
+                }
+                thead {
+                    display: none;
+                }
+                table {
+                    min-width: 0;
+                }
+                tbody tr {
+                    border: 1px solid var(--border);
+                    border-radius: 10px;
+                    padding: 8px 10px;
+                    margin-bottom: 10px;
+                    background: var(--bg);
+                }
+                @media (prefers-color-scheme: dark) {
+                    tbody tr {
+                        background: #131c27;
+                    }
+                }
+                tbody tr td {
+                    border: none;
+                    padding: 4px 0;
+                    display: flex;
+                    gap: 8px;
+                }
+                tbody tr td::before {
+                    content: attr(data-label);
+                    font-weight: 600;
+                    color: var(--muted);
+                    flex: 0 0 64px;
+                    font-size: 12.5px;
+                }
+                .toc ol {
+                    columns: 1;
+                }
+            }
+
+            .no-result {
+                display: none;
+                text-align: center;
+                color: var(--muted);
+                padding: 30px 10px;
+            }
+            footer {
+                text-align: center;
+                color: var(--muted);
+                font-size: 12px;
+                padding: 10px 16px 30px;
+            }
+            .top-btn {
+                position: fixed;
+                right: 16px;
+                bottom: calc(16px + env(safe-area-inset-bottom));
+                width: 44px;
+                height: 44px;
+                border-radius: 50%;
+                background: var(--tg);
+                color: #fff;
+                border: none;
+                font-size: 20px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+                cursor: pointer;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.2s;
+                z-index: 30;
+            }
+            .top-btn.show {
+                opacity: 0.9;
+                pointer-events: auto;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <div class="header-inner">
+                <h1>Telegram 机器人命令手册</h1>
+            </div>
+            <div class="search-wrap">
+                <input
+                    id="search"
+                    type="search"
+                    placeholder="🔍 搜索命令，如 补单 / 预付 / 通道…"
+                    autocomplete="off"
+                />
+            </div>
+        </header>
+
+        <main>
+            <details class="toc" open>
+                <summary>目录</summary>
+                <ol>
+                    <li><a href="#s1">权限说明</a></li>
+                    <li><a href="#s2">订单类命令</a></li>
+                    <li><a href="#s3">余额 / 记账类</a></li>
+                    <li><a href="#s4">预付类命令</a></li>
+                    <li><a href="#s5">统计 / 查询类</a></li>
+                    <li><a href="#s6">地址类（TRC20）</a></li>
+                    <li><a href="#s7">通道 / 渠道类</a></li>
+                    <li><a href="#s8">产品类命令</a></li>
+                    <li><a href="#s9">预警类命令</a></li>
+                    <li><a href="#s10">绑定 / 群管理</a></li>
+                    <li><a href="#s11">系统 / 开关类</a></li>
+                    <li><a href="#s12">白名单 Code</a></li>
+                    <li><a href="#s13">传单屏蔽</a></li>
+                    <li><a href="#s14">群发 / 转发</a></li>
+                    <li><a href="#s15">自动传单（图片）</a></li>
+<!--                    <li><a href="#s16">按钮回调</a></li>-->
+                </ol>
+            </details>
+
+            <section class="legend">
+                <h2 id="s1">1. 权限说明</h2>
+                <p>
+                    命令鉴权由
+                    <code>judgeRole(uname, flag)</code> 完成，权限（以 <code>@用户名</code> 为
+                    key，<code>cardType</code> 为角色值）.
+                </p>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>标记</th>
+                                <th>含义</th>
+                                <th>通过条件</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td data-label="标记">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="含义">管理员级命令</td>
+                                <td data-label="条件">
+                                    用户角色
+                                    <code>cardType == "0"</code>（超管）
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="标记">
+                                    <span class="badge b1">1</span>
+                                </td>
+                                <td data-label="含义">操作员级命令</td>
+                                <td data-label="条件">
+                                    用户角色为 <code>"0"</code>（超管）或
+                                    <code>"1"</code>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="标记">
+                                    <span class="badge b3">3</span>
+                                </td>
+                                <td data-label="含义">无需鉴权</td>
+                                <td data-label="条件">
+                                    任何人均可触发（如查单回复）
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="标记">
+                                    <span class="badge bp">公开</span>
+                                </td>
+                                <td data-label="含义">源码注释了鉴权</td>
+                                <td data-label="条件">实际对所有人开放</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="note">
+                    cardType == "0"
+                    为超级管理员，可通过任意权限校验；其它角色仅能通过与自身
+                    flag 精确匹配的命令。消息入口
+
+                </div>
+            </section>
+
+            <section>
+                <h2 id="s2">2. 订单类命令</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>命令</th>
+                                <th>权限</th>
+                                <th>格式 / 示例</th>
+                                <th>说明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td data-label="命令">查单 / 空单</td>
+                                <td data-label="权限">
+                                    <span class="badge b1">1</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>查单MCH202401010001</code>
+                                </td>
+                                <td data-label="说明">
+                                    按商户单号查询订单详情
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">补单</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>补单P20240101xxxx</code>
+                                </td>
+                                <td data-label="说明">
+                                    管理端补单，并回查订单结果
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">批量补单</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>批量补单 单号1 单号2 …</code
+                                    >（空格/换行分隔，最多 20 单）
+                                </td>
+                                <td data-label="说明">
+                                    弹出「✅确认补单 /
+                                    ❌取消」按钮，确认后逐单补单+补发通知
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">冲正</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>冲正P20240101xxxx</code>
+                                </td>
+                                <td data-label="说明">
+                                    弹出确认按钮，确认后执行订单冲正
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">补发通知</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>补发通知P20240101xxxx</code>（长度
+                                    &gt; 10）
+                                </td>
+                                <td data-label="说明">
+                                    重新向商户推送支付回调通知
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">批量转单号</td>
+                                <td data-label="权限">
+                                    <span class="badge b1">1</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>批量转单号</code> +
+                                    换行多行单号，或回复含单号的消息
+                                </td>
+                                <td data-label="说明">
+                                    将商户单号批量转换为系统支付单号
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">授权</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>授权10001</code>
+                                </td>
+                                <td data-label="说明">
+                                    将当前群授权绑定到指定商户号
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">绑定|</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>绑定|alipay</code>（长度 &gt; 3）
+                                </td>
+                                <td data-label="说明">按支付类型绑定当前群</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section>
+                <h2 id="s3">3. 余额 / 记账类命令</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>命令</th>
+                                <th>权限</th>
+                                <th>格式 / 示例</th>
+                                <th>说明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td data-label="命令">记账</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>记账 单号</code> 或
+                                    <code>记账 单号 金额</code>
+                                </td>
+                                <td data-label="说明">
+                                    登记订单到账单，置顶账单消息
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">账单</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例"><code>账单</code></td>
+                                <td data-label="说明">查看当前群账单</td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">撤销本次</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例"><code>撤销本次</code></td>
+                                <td data-label="说明">撤销本次记账</td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">撤销记账</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>撤销记账单号</code>
+                                </td>
+                                <td data-label="说明">撤销指定单号的记账</td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">查看余额</td>
+                                <td data-label="权限">
+                                    <span class="badge bp">公开</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>查看余额</code> / <code>0</code> /
+                                    <code>+0</code>
+                                </td>
+                                <td data-label="说明">查询当前群余额</td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">调整余额</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>调整余额100</code> /
+                                    <code>调整余额-100</code>
+                                </td>
+                                <td data-label="说明">手动调整余额</td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">计算</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>计算100*3+50</code>
+                                </td>
+                                <td data-label="说明">
+                                    表达式计算（也支持直接发送纯算式，如
+                                    <code>100+200</code>）
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="note">
+                    直接发送合法算式（isValidExpression
+                    判定）也会被当作计算命令处理，需要权限 0。
+                </div>
+            </section>
+
+            <section>
+                <h2 id="s4">4. 预付类命令</h2>
+                <h3>4.1 商户 / 供货商预付（+ / - 前缀）</h3>
+                <p>
+                    机器人根据当前群绑定关系自动判断处理对象（商户群 →
+                    商户预付；供货商群 → 供货商预付；否则通道预付）。
+                </p>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>命令</th>
+                                <th>权限</th>
+                                <th>格式 / 示例</th>
+                                <th>说明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td data-label="命令">增加预付</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>+100</code>（人民币）或
+                                    <code>+100u7.2</code>（U 数 × 汇率）
+                                </td>
+                                <td data-label="说明">
+                                    增加预付额度，置顶结果
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">扣减预付</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>-100</code> 或 <code>-100u7.2</code>
+                                </td>
+                                <td data-label="说明">扣减预付额度</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <h3>4.2 通道预付（通道预付 前缀）</h3>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>命令</th>
+                                <th>权限</th>
+                                <th>格式 / 示例</th>
+                                <th>说明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td data-label="命令">通道预付增减</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>通道预付+100</code
+                                    >、<code>通道预付-50</code>、<code
+                                        >通道预付+100u7.2</code
+                                    >
+                                </td>
+                                <td data-label="说明">调整通道预付余额</td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">通道预付查看</td>
+                                <td data-label="权限">
+                                    <span class="badge bp">公开</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>通道预付查看</code>
+                                </td>
+                                <td data-label="说明">
+                                    查看通道预付总数 / 总跑量 / 预付结算
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">通道预付明细</td>
+                                <td data-label="权限">
+                                    <span class="badge bp">公开</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>通道预付明细</code>
+                                </td>
+                                <td data-label="说明">查看当日通道预付明细</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <h3>4.3 预付统计</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>命令</th>
+                                <th>权限</th>
+                                <th>说明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td data-label="命令">今日预付</td>
+                                <td data-label="权限">
+                                    <span class="badge b1">1</span>
+                                </td>
+                                <td data-label="说明">当日商户预付汇总</td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">昨日预付</td>
+                                <td data-label="权限">
+                                    <span class="badge b1">1</span>
+                                </td>
+                                <td data-label="说明">昨日商户预付汇总</td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">预付明细</td>
+                                <td data-label="权限">
+                                    <span class="badge b1">1</span>
+                                </td>
+                                <td data-label="说明">按群展示预付明细</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section>
+                <h2 id="s5">5. 统计 / 查询类命令</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>命令</th>
+                                <th>权限</th>
+                                <th>说明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td data-label="命令">跑量</td>
+                                <td data-label="权限">
+                                    <span class="badge bp">公开*</span>
+                                </td>
+                                <td data-label="说明">当日商户跑量统计</td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">昨日跑量</td>
+                                <td data-label="权限">
+                                    <span class="badge bp">公开*</span>
+                                </td>
+                                <td data-label="说明">昨日商户跑量统计</td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">通道统计</td>
+                                <td data-label="权限">
+                                    <span class="badge b1">1</span>
+                                </td>
+                                <td data-label="说明">供货商 / 通道统计</td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">昨日通道统计</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="说明">昨日通道统计</td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">日切统计</td>
+                                <td data-label="权限">
+                                    <span class="badge bp">公开*</span>
+                                </td>
+                                <td data-label="说明">当日日切统计</td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">昨日日切统计</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="说明">昨日日切统计</td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">uj</td>
+                                <td data-label="权限">
+                                    <span class="badge b1">1</span>
+                                </td>
+                                <td data-label="说明">欧易行情 - 全部</td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">lz</td>
+                                <td data-label="权限">
+                                    <span class="badge b1">1</span>
+                                </td>
+                                <td data-label="说明">欧易行情 - 支付宝</td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">lw</td>
+                                <td data-label="权限">
+                                    <span class="badge b1">1</span>
+                                </td>
+                                <td data-label="说明">欧易行情 - 微信</td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">lb</td>
+                                <td data-label="权限">
+                                    <span class="badge b1">1</span>
+                                </td>
+                                <td data-label="说明">欧易行情 - 银行卡</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="note">
+                    带 * 的命令源码中鉴权被注释，实际对所有人开放。
+                </div>
+            </section>
+
+            <section>
+                <h2 id="s6">6. 地址类命令（TRC20）</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>命令</th>
+                                <th>权限</th>
+                                <th>格式 / 示例</th>
+                                <th>说明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td data-label="命令">地址</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>地址</code>（默认地址1）、<code
+                                        >地址1</code
+                                    >
+                                    / <code>地址2</code> / <code>地址3</code>
+                                </td>
+                                <td data-label="说明">
+                                    查询收款地址（HTML 格式）
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">设置地址</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>设置地址T…</code>（设地址1）、<code
+                                        >设置地址1T…</code
+                                    >
+                                    / <code>2T…</code> / <code>3T…</code>
+                                </td>
+                                <td data-label="说明">
+                                    设置 TRC20 收款地址（须以 T
+                                    开头，长度校验严格）
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">关闭地址提示</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>关闭地址提示</code>
+                                </td>
+                                <td data-label="说明">
+                                    关闭本群 TRC20 地址自动识别提示
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">打开地址提示</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>打开地址提示</code>
+                                </td>
+                                <td data-label="说明">开启本群地址提示</td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">关闭全局地址提示</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>关闭全局地址提示</code>
+                                </td>
+                                <td data-label="说明">
+                                    关闭所有群的地址提示（优先级最高）
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">打开全局地址提示</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>打开全局地址提示</code>
+                                </td>
+                                <td data-label="说明">恢复全局地址提示</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="note">
+                    自动检测：开关开启时，群内任何包含 T 且长度 &gt; 30
+                    的非机器人消息，会被扫描出可能的 TRC20 地址并弹出确认按钮。
+                </div>
+            </section>
+
+            <section>
+                <h2 id="s7">7. 通道 / 渠道类命令</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>命令</th>
+                                <th>权限</th>
+                                <th>格式 / 示例</th>
+                                <th>说明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td data-label="命令">查看渠道</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>查看渠道abc</code>（总长 &lt; 15）
+                                </td>
+                                <td data-label="说明">
+                                    按上游编码查询绑定通道及费率
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">关闭渠道</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>关闭渠道abc</code>
+                                </td>
+                                <td data-label="说明">
+                                    关闭指定上游编码对应的通道
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">打开渠道</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>打开渠道abc</code>
+                                </td>
+                                <td data-label="说明">
+                                    打开指定上游编码对应的通道
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">修改渠道 / 修改通道</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>修改渠道abc#10.5</code> 或
+                                    <code>修改渠道abc/10.5</code>
+                                </td>
+                                <td data-label="说明">
+                                    修改通道费率（# 与 / 不能混用，费率 0~100）
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">打开通道 / 关闭通道</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>打开通道 code1 code2</code>、<code
+                                        >关闭通道 code1 code2</code
+                                    >
+                                </td>
+                                <td data-label="说明">
+                                    按通道编码批量开关（空格分隔多个）
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">新增通道 / 新建通道</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>新增通道 abc/10.5 8000/8</code>
+                                </td>
+                                <td data-label="说明">
+                                    批量新增，分隔符 / 或
+                                    #（单条不可混用）；供货商群多渠道弹出选择按钮
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">批量修改通道</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>批量修改通道 code1#10 code2/8</code>
+                                </td>
+                                <td data-label="说明">批量修改通道费率</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section>
+                <h2 id="s8">8. 产品类命令</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>命令</th>
+                                <th>权限</th>
+                                <th>格式 / 示例</th>
+                                <th>说明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td data-label="命令">查产品费率</td>
+                                <td data-label="权限">
+                                    <span class="badge bp">公开</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>产品2000</code> 或
+                                    <code>产品&lt;产品编码&gt;</code>（长度 &gt;
+                                    4）
+                                </td>
+                                <td data-label="说明">
+                                    查询单个产品费率，含产品规则
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">产品开关</td>
+                                <td data-label="权限">
+                                    <span class="badge bp">公开</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>产品2000#o</code
+                                    >（开）、<code>产品2000#c</code>（关）
+                                </td>
+                                <td data-label="说明">开关商户对应产品</td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">设置产品 / 配置产品</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>设置产品2000#10.5</code>
+                                </td>
+                                <td data-label="说明">
+                                    为当前群商户设置/新增产品费率（0~100）
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">产品费率</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例"><code>产品费率</code></td>
+                                <td data-label="说明">
+                                    查询当前群商户全部产品费率
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">批量修改产品</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>批量修改产品 2000#10 2001/8</code>
+                                </td>
+                                <td data-label="说明">批量修改产品费率</td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">加入产品规则</td>
+                                <td data-label="权限">
+                                    <span class="badge bp">公开</span>
+                                </td>
+                                <td data-label="示例">
+                                    回复一条消息并发送
+                                    <code>加入产品规则2000</code> 或
+                                    <code>加入产品规则&lt;编码&gt;</code>
+                                </td>
+                                <td data-label="说明">
+                                    将被回复消息的文本保存为产品规则
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">清零权重</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>清零权重2000</code>
+                                </td>
+                                <td data-label="说明">
+                                    清零指定产品今日所有轮询通道权重计数
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">对接信息</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例"><code>对接信息</code></td>
+                                <td data-label="说明">
+                                    查看当前群商户的 API 对接信息
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section>
+                <h2 id="s9">9. 预警类命令</h2>
+                <p>
+                    格式统一为
+                    <code>命令|渠道代码|数值@机器人用户名</code>（去空格后按 |
+                    分割为 3 段，数值需为带符号数字）。
+                </p>
+                <h3>9.1 通道预警（渠道代码需含 pay）</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>命令</th>
+                                <th>权限</th>
+                                <th>示例</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td data-label="命令">通道预警</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>通道预警|xxxpay|10000@BotName</code>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">通道预警停单</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code
+                                        >通道预警停单|xxxpay|5000@BotName</code
+                                    >
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">通道预警频率</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>通道预警频率|xxxpay|60@BotName</code>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <h3>9.2 供货商预警（渠道代码为供货商 ID）</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>命令</th>
+                                <th>权限</th>
+                                <th>示例</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td data-label="命令">供货商预警</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>供货商预警|1001|10000@BotName</code>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">供货商预警停单</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code
+                                        >供货商预警停单|1001|5000@BotName</code
+                                    >
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">供货商预警频率</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>供货商预警频率|1001|60@BotName</code>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section>
+                <h2 id="s10">10. 绑定 / 群管理类命令</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>命令</th>
+                                <th>权限</th>
+                                <th>格式 / 示例</th>
+                                <th>说明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td data-label="命令">绑定信息 / 群信息</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例"><code>绑定信息</code></td>
+                                <td data-label="说明">查看当前群绑定信息</td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">绑定供货商</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>绑定供货商1001</code>
+                                </td>
+                                <td data-label="说明">
+                                    将当前群绑定到指定供货商 ID
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">查看商户</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例"><code>查看商户</code></td>
+                                <td data-label="说明">查看当前群绑定的商户</td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">退出群组</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例"><code>退出群组</code></td>
+                                <td data-label="说明">机器人退出当前群</td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">清除绑定 / 解除绑定</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例"><code>清除绑定</code></td>
+                                <td data-label="说明">清除当前群所有绑定</td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">群成员</td>
+                                <td data-label="权限">
+                                    <span class="badge b1">1</span>
+                                </td>
+                                <td data-label="示例"><code>群成员</code></td>
+                                <td data-label="说明">查看群成员快照</td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">获取群ID</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>获取群ID</code> /
+                                    <code>获取群id</code> / <code>群id</code>
+                                </td>
+                                <td data-label="说明">返回当前群 chatId</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section>
+                <h2 id="s11">11. 系统 / 开关类命令</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>命令</th>
+                                <th>权限</th>
+                                <th>格式 / 示例</th>
+                                <th>说明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td data-label="命令">打开催单 / 关闭催单</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例"><code>打开催单</code></td>
+                                <td data-label="说明">开关催单功能</td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">设置为管理群</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    首次：<code>设置为管理群 超级密码</code
+                                    >；已有管理群：<code>设置为管理群</code>
+                                </td>
+                                <td data-label="说明">
+                                    设置 /
+                                    变更管理群（含密码校验，含密码消息会被删除）
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">更新商户群发信息</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>更新商户群发信息</code>
+                                </td>
+                                <td data-label="说明">刷新商户群发缓存</td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">传单总开关状态</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>传单总开关状态</code>
+                                </td>
+                                <td data-label="说明">查看总传单开关状态</td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">总传单打开 / 关闭</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>总传单打开</code>
+                                </td>
+                                <td data-label="说明">全局传单开关</td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">传单打开 / 关闭</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例"><code>传单打开</code></td>
+                                <td data-label="说明">本群传单开关</td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">核对渠道对接信息</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>核对渠道对接信息</code>
+                                </td>
+                                <td data-label="说明">
+                                    核对当前群渠道对接信息
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">设置回调IP</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>设置回调IP1.2.3.4</code>（长度 &gt;
+                                    6）
+                                </td>
+                                <td data-label="说明">
+                                    设置平台回调 IP（siteIp）
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">设置下单IP</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>设置下单IP1.2.3.4</code>
+                                </td>
+                                <td data-label="说明">
+                                    设置平台下单 IP（orderIp）
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">平台IP</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例"><code>平台IP</code></td>
+                                <td data-label="说明">查看下单 IP / 回调 IP</td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">获取系统文档</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>获取系统文档</code>（仅限管理群）
+                                </td>
+                                <td data-label="说明">
+                                    获取系统文档地址及访问验证码
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">打开系统</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>打开系统</code>（仅限管理群）
+                                </td>
+                                <td data-label="说明">开启系统进单</td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">关闭系统</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>关闭系统</code>（仅限管理群）
+                                </td>
+                                <td data-label="说明">
+                                    弹确认按钮后关闭系统进单
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+
+
+            <section>
+                <h2 id="s13">13. 传单屏蔽命令</h2>
+                <p>
+                    防 bot-to-bot 重复传单。屏蔽名单为全局（Redis
+                    Set），换群同样生效。
+                </p>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>命令</th>
+                                <th>权限</th>
+                                <th>格式 / 示例</th>
+                                <th>说明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td data-label="命令">传单屏蔽</td>
+                                <td data-label="权限">
+                                    <span class="badge b1">1</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>传单屏蔽@a @b @c</code>
+                                </td>
+                                <td data-label="说明">
+                                    将一个或多个用户加入全局屏蔽名单
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">解除传单屏蔽</td>
+                                <td data-label="权限">
+                                    <span class="badge b1">1</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>解除传单屏蔽@a @b</code>
+                                </td>
+                                <td data-label="说明">从屏蔽名单移除</td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">查看传单屏蔽</td>
+                                <td data-label="权限">
+                                    <span class="badge b1">1</span>
+                                </td>
+                                <td data-label="示例">
+                                    <code>查看传单屏蔽</code>
+                                </td>
+                                <td data-label="说明">列出当前屏蔽名单</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section>
+                <h2 id="s14">14. 群发 / 转发命令（回复消息触发）</h2>
+                <p>
+                    以下命令需以「回复某条消息」的方式发送，机器人将该被回复消息进行转发
+                    / 群发。
+                </p>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>命令</th>
+                                <th>权限</th>
+                                <th>说明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td data-label="命令">删除</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="说明">
+                                    删除被回复消息及本条命令消息
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">商户群转发</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="说明">转发到所有商户群</td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">商户群@转发</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="说明">转发到商户群并 @ 提及</td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">多机群发</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="说明">
+                                    多 Bot 轮询群发（不含 @）
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">多机群@转发</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="说明">
+                                    多 Bot 轮询群发（含 @ 提及）
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">通道群转发</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="说明">转发到通道群</td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">商户群发产品</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="说明">
+                                    <code>商户群发产品2000</code>（产品 ID
+                                    须为数字），群发并附带产品规则查看按钮
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="命令">群发状态</td>
+                                <td data-label="权限">
+                                    <span class="badge b0">0</span>
+                                </td>
+                                <td data-label="说明">
+                                    <code>群发状态</code
+                                    >（纯文本命令）查看多机群发进度
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section>
+                <h2 id="s15">15. 自动传单（图片消息）</h2>
+                <p>
+                    向群内发送<strong>带说明文字（caption）的图片</strong>时，机器人自动解析说明中的商户单号（正则
+                    <code>[a-zA-Z0-9_\-]{7,}</code>）：
+                </p>
+                <ul style="font-size: 14px; padding-left: 20px">
+                    <li>
+                        若订单已支付成功/完成 → 回复「已支付成功 | 待回调 /
+                        已回调」。
+                    </li>
+                    <li>
+                        若订单待处理 →
+                        复制图片转发到绑定的上游渠道群，并记录查单记录；若开启催单，则进入催单流程。
+                    </li>
+                    <li>
+                        渠道群回复该图片消息时，机器人会把回复内容回传到对应商户群。
+                    </li>
+                </ul>
+                <div class="note">
+                    若发送者在传单屏蔽名单中，则忽略该图片消息。
+                </div>
+            </section>
+
+            
+
+            <p class="no-result" id="noResult">没有找到匹配的命令 🤔</p>
+
+            <footer>
+                Telegram 机器人命令手册 · 依据 TelegramBot.java 源码整理<br />
+                本文档随源码迭代，如有出入以代码为准。
+            </footer>
+        </main>
+
+        <button class="top-btn" id="topBtn" aria-label="回到顶部">↑</button>
+
+        <script>
+            // 搜索过滤：按行匹配，隐藏无匹配的 section
+            var search = document.getElementById("search");
+            var noResult = document.getElementById("noResult");
+            search.addEventListener("input", function () {
+                var q = this.value.trim().toLowerCase();
+                var sections = document.querySelectorAll("main > section");
+                var anyVisible = false;
+                sections.forEach(function (sec) {
+                    if (!q) {
+                        sec.style.display = "";
+                        sec.querySelectorAll("tbody tr").forEach(function (tr) {
+                            tr.style.display = "";
+                        });
+                        anyVisible = true;
+                        return;
+                    }
+                    var rows = sec.querySelectorAll("tbody tr");
+                    var secHit = false;
+                    var headText = (
+                        sec.querySelector("h2")
+                            ? sec.querySelector("h2").textContent
+                            : ""
+                    ).toLowerCase();
+                    rows.forEach(function (tr) {
+                        var hit =
+                            tr.textContent.toLowerCase().indexOf(q) > -1 ||
+                            headText.indexOf(q) > -1;
+                        tr.style.display = hit ? "" : "none";
+                        if (hit) secHit = true;
+                    });
+                    // 无表格的 section（理论上没有）按标题匹配
+                    if (rows.length === 0) secHit = headText.indexOf(q) > -1;
+                    sec.style.display = secHit ? "" : "none";
+                    if (secHit) anyVisible = true;
+                });
+                noResult.style.display = anyVisible ? "none" : "block";
+            });
+
+            // 回到顶部
+            var topBtn = document.getElementById("topBtn");
+            window.addEventListener("scroll", function () {
+                if (window.scrollY > 400) topBtn.classList.add("show");
+                else topBtn.classList.remove("show");
+            });
+            topBtn.addEventListener("click", function () {
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            });
+        </script>
+    </body>
+</html>
